@@ -6,10 +6,17 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  title     String
+  amount    Float
+  category  String
+  createdAt DateTime @default(now())
 }
