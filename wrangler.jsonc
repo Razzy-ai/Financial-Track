@@ -7,8 +7,7 @@
   //   "nodejs_compat"
   // ],
    "vars": {
-     "DATABASE_URL" : "postgresql://neondb_owner:npg_54ZDnVCOQIKi@ep-solitary-morning-a4pddr3z-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require",
-     "ACCELERATE_URL":"prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZjNhNjM4NjgtMDRiYS00ZWU1LTgyOGEtMmI4NmFiOTdjYzg2IiwidGVuYW50X2lkIjoiNGRhZTFkMzdmNTAyZjM1YjFhYjViZTg3ZGM5MjU2ZDhjMDNmMjAwMTNkY2QwNmRhOTA0MGIwNGRjMGNlYjdlYSIsImludGVybmFsX3NlY3JldCI6IjdlNDNjYjFiLTVhNGYtNDYwMy1hYTVlLTU2ODVmMGJkMzljYyJ9.eEvLj7rzoG9zJ-aqOolK_nQO3IjqeSYh80tR3ciO0qA",
+     "DATABASE_URL":"prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZmZiZjFhNGYtYjM1OC00Nzk1LWE1MDktZmQ1YjYzZTdmYjdmIiwidGVuYW50X2lkIjoiNGRhZTFkMzdmNTAyZjM1YjFhYjViZTg3ZGM5MjU2ZDhjMDNmMjAwMTNkY2QwNmRhOTA0MGIwNGRjMGNlYjdlYSIsImludGVybmFsX3NlY3JldCI6IjdlNDNjYjFiLTVhNGYtNDYwMy1hYTVlLTU2ODVmMGJkMzljYyJ9.q0_W0W7sGB4yUjxm3rtf3ooMth7ihN6pr9gDRzaIaZs",
      "JWT_SECRET" : "neon123r"
    },
   // "kv_namespaces": [
