@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import bcrypt from 'bcryptjs';
 
 export const usersRouter = new Hono<{
   Bindings: {
@@ -14,13 +15,17 @@ usersRouter.post('/', async (c) => {
   const body = await c.req.json();
 
   try {
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+
     const user = await prisma.user.create({
       data: {
         email: body.email,
-        password: body.password, // You should hash this in a real app!
+        password: hashedPassword,
       },
     });
-    return c.json(user);
+
+    const { password, ...safeUser } = user;
+    return c.json(safeUser);
   } catch (error) {
     console.error('❌ POST /users error:', error);
     return c.json({ error: 'User creation failed', details: String(error) }, 500);
@@ -35,7 +40,9 @@ usersRouter.get('/:id', async (c) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return c.json({ error: 'User not found' }, 404);
-    return c.json(user);
+
+    const { password, ...safeUser } = user;
+    return c.json(safeUser);
   } catch (error) {
     console.error('❌ GET /users/:id error:', error);
     return c.json({ error: 'User fetch failed', details: String(error) }, 500);
@@ -49,14 +56,18 @@ usersRouter.put('/:id', async (c) => {
   const body = await c.req.json();
 
   try {
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
         email: body.email,
-        password: body.password, // Again, hash in production
+        password: hashedPassword,
       },
     });
-    return c.json(user);
+
+    const { password, ...safeUser } = user;
+    return c.json(safeUser);
   } catch (error) {
     console.error('❌ PUT /users/:id error:', error);
     return c.json({ error: 'User update failed', details: String(error) }, 500);
