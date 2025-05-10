@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { usersRouter } from './routes/users';
+import { categoriesRouter } from './routes/categories';
 import { transactionsRouter } from './routes/transactions';
 import { cors } from 'hono/cors';
 
@@ -16,5 +17,7 @@ app.use('/*', cors());
 app.route('/api/v1/transactions', transactionsRouter);
 
 app.route('api/v1/users', usersRouter);
+
+app.route('api/v1/categories', categoriesRouter);
 
 export default app;
