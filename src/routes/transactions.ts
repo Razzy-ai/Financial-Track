@@ -35,7 +35,9 @@ transactionsRouter.post('/', async (c) => {
       data: {
         title: body.title,
         amount: body.amount,
-        category: body.category,
+         user: { connect: { id: body.userId } },
+       category: { connect: { id: body.categoryId } },
+        transactionType: { connect: { id: body.typeId } },
       },
     });
     return c.json(transaction);
