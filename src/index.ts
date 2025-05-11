@@ -8,6 +8,7 @@ import { transactionNotesRouter } from './routes/transactionNotes';
 import { userSettingsRouter } from './routes/userSettings';
 import { budgetRouter } from './routes/budgets';
 import { cors } from 'hono/cors';
+import { recurringTransactionsRouter } from './routes/recurringTransactions';
 
 const app = new Hono<{
   Bindings: {
@@ -34,5 +35,7 @@ app.route('api/v1/transactionNotes', transactionNotesRouter);
 app.route('api/v1/userSettings', userSettingsRouter);
 
 app.route('api/v1/budgets', budgetRouter);
+
+app.route('api/v1/recurringTransactions', recurringTransactionsRouter);
 
 export default app;
