@@ -6,6 +6,7 @@ import { transactionTypesRouter } from './routes/transactionTypes';
 import { transactionTagsRouter } from './routes/transactionTags';
 import { transactionNotesRouter } from './routes/transactionNotes';
 import { userSettingsRouter } from './routes/userSettings';
+import { budgetRouter } from './routes/budgets';
 import { cors } from 'hono/cors';
 
 const app = new Hono<{
@@ -31,5 +32,7 @@ app.route('api/v1/transactionTags', transactionTagsRouter);
 app.route('api/v1/transactionNotes', transactionNotesRouter);
 
 app.route('api/v1/userSettings', userSettingsRouter);
+
+app.route('api/v1/budgets', budgetRouter);
 
 export default app;
