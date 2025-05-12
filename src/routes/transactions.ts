@@ -63,7 +63,8 @@ transactionsRouter.put('/:id', async (c) => {
       data: {
         title: body.title,
         amount: body.amount,
-        category: body.category,
+        categoryId: body.categoryId,  
+        typeId: body.typeId,  
       },
     });
 
