@@ -77,7 +77,7 @@ transactionsRouter.put('/:id', async (c) => {
 
   try {
     const updatedTransaction = await prisma.transaction.update({
-      where: { id: String(id) },
+      where: { id: paramParsed.data },
       data: {
         title: bodyparsed.data.title,
         amount: bodyparsed.data.amount,

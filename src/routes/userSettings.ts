@@ -59,18 +59,25 @@ userSettingsRouter.post('/', async (c) => {
   }
 });
 
+ 
+
 // PUT update user settings
 userSettingsRouter.put('/:userId', async (c) => {
+  
   const prisma = getPrisma(c.env.DATABASE_URL);
   const userId = c.req.param('userId');
   const body = await c.req.json();
+  const paramParsed = userIdParamSchema.safeParse(userId);
+
+  const existing = await prisma.transactionType.findUnique({ where: { id: paramParsed.data } });
+    if (!existing) return c.json({ error: 'Transaction type not found' }, 404);
+
   
   const bodyparsed = updateUserSettingsSchema.safeParse(body);
   if (!bodyparsed.success) {
     return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
   }
-
-  const paramParsed = userIdParamSchema.safeParse(userId);
+  
   if (!paramParsed.success) {
     return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
   }
@@ -96,6 +103,11 @@ userSettingsRouter.delete('/:userId', async (c) => {
   const userId = c.req.param('userId');
 
    const parsed = userIdParamSchema.safeParse(userId);
+   
+   const existing = await prisma.transactionType.findUnique({ where: { id: parsed.data } });
+     if (!existing) return c.json({ error: 'Transaction type not found' }, 404);
+
+
   if (!parsed.success) {
     return c.json({ error: 'Invalid userId', details: parsed.error.flatten() }, 400);
   }

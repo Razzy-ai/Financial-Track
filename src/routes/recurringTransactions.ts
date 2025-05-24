@@ -24,7 +24,7 @@ recurringTransactionsRouter.post('/', async (c) => {
         amount: bodyparsed.data.amount,
         category: bodyparsed.data.category,
         frequency: bodyparsed.data.frequency,
-        nextDate: new Date(body.nextDate)
+        nextDate: new Date(bodyparsed.data.nextDate)
       },
     });
     return c.json(rt);
