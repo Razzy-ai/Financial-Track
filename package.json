@@ -11,7 +11,7 @@
     "@prisma/extension-accelerate": "^1.3.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
-    "finance-common": "^1.0.3",
+    "finance-common": "^1.0.5",
     "hono": "^4.7.8",
     "jsonwebtoken": "^9.0.2",
     "prisma": "^6.7.0",

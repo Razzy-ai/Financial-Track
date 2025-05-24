@@ -2,19 +2,13 @@ import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 import bcrypt from 'bcryptjs';
-import {z} from "zod";
-import { createUserSchema, updateUserSchema } from 'finance-common';
+import { createUserSchema, updateUserSchema , userIdParamSchema} from 'finance-common';
 
 export const usersRouter = new Hono<{
   Bindings: {
     DATABASE_URL: string;
   };
 }>();
-
-// Schema for route param validation
-const userIdParamSchema = z.object({
-  id: z.string().cuid(),
-});
 
 
 // Create a new user
@@ -44,17 +38,19 @@ usersRouter.post('/', async (c) => {
   }
 });
 
+
 // Get user by ID
 usersRouter.get('/:id', async (c) => {
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-  const paramCheck = userIdParamSchema.safeParse({ id: c.req.param('id') });
- 
+   
+  const userId = c.req.param('id');
+  const paramCheck = userIdParamSchema.safeParse(userId);
   if (!paramCheck.success) {
     return c.json({ error: 'Invalid user ID', details: paramCheck.error.flatten() }, 400);
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: paramCheck.data.id } });
+    const user = await prisma.user.findUnique({ where: { id: paramCheck.data } });
     if (!user) return c.json({ error: 'User not found' }, 404);
 
     const { password, ...safeUser } = user;
@@ -69,30 +65,32 @@ usersRouter.get('/:id', async (c) => {
 usersRouter.put('/:id', async (c) => {
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
   const userId = c.req.param('id');
-  const paramCheck = userIdParamSchema.safeParse({ id: userId });
+  const paramCheck = userIdParamSchema.safeParse(userId);
+  const body = await c.req.json();
 
   if (!paramCheck.success) {
     return c.json({ error: 'Invalid user ID', details: paramCheck.error.flatten() }, 400);
   }
 
-
-  const body = await c.req.json();
- 
-  // Validate with updateUserSchema
   const parseResult = updateUserSchema.safeParse(body);
   if (!parseResult.success) {
     return c.json({ error: 'Validation error', details: parseResult.error.flatten() }, 400);
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(body.password, 10);
+    let updatedData: { email?: string; password?: string } = {};
+
+    if (parseResult.data.email) {
+      updatedData.email = parseResult.data.email;
+    }
+
+    if (parseResult.data.password) {
+      updatedData.password = await bcrypt.hash(parseResult.data.password, 10);
+    }
 
     const user = await prisma.user.update({
-      where: { id: paramCheck.data.id },
-      data: {
-        email: body.email,
-        password: hashedPassword,
-      },
+      where: { id: paramCheck.data },
+      data: updatedData,
     });
 
     const { password, ...safeUser } = user;
@@ -106,14 +104,15 @@ usersRouter.put('/:id', async (c) => {
 // Delete user
 usersRouter.delete('/:id', async (c) => {
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-  const paramCheck = userIdParamSchema.safeParse({ id: c.req.param('id') });
-
+  
+   const userId = c.req.param('id');
+   const paramCheck = userIdParamSchema.safeParse(userId);
   if (!paramCheck.success) {
     return c.json({ error: 'Invalid user ID', details: paramCheck.error.flatten() }, 400);
   }
 
   try {
-    await prisma.user.delete({ where: { id: paramCheck.data.id } });
+    await prisma.user.delete({ where: { id: paramCheck.data } });
     return c.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('❌ DELETE /users/:id error:', error);

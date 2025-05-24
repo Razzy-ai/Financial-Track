@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import { createTransactionSchema,updateTransactionSchema,userIdParamSchema } from 'finance-common';
+
 
 export const transactionsRouter = new Hono<{
   Bindings: {
@@ -28,16 +30,22 @@ transactionsRouter.post('/', async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
+  
+    const body = await c.req.json();
+    const bodyparsed = createTransactionSchema.safeParse(body);
+    if (!bodyparsed.success) {
+     return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+   }
 
   try {
-    const body = await c.req.json();
+
     const transaction = await prisma.transaction.create({
       data: {
-        title: body.title,
-        amount: body.amount,
-         user: { connect: { id: body.userId } },
-       category: { connect: { id: body.categoryId } },
-        transactionType: { connect: { id: body.typeId } },
+        title: bodyparsed.data.title,
+        amount: bodyparsed.data.amount,
+         user: { connect: { id: bodyparsed.data.userId } },
+       category: { connect: { id: bodyparsed.data.categoryId } },
+        transactionType: { connect: { id: bodyparsed.data.typeId } },
       },
     });
     return c.json(transaction);
@@ -54,17 +62,27 @@ transactionsRouter.put('/:id', async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
-  const { id } = c.req.param();
-  const body = await c.req.json();
+
+  const id = c.req.param('id');
+     const paramParsed = userIdParamSchema.safeParse(id);
+    if (!paramParsed.success) {
+      return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+    }
+   
+    const body = await c.req.json();
+    const bodyparsed = updateTransactionSchema.safeParse(body);
+     if (!bodyparsed.success) {
+       return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+     }
 
   try {
     const updatedTransaction = await prisma.transaction.update({
       where: { id: String(id) },
       data: {
-        title: body.title,
-        amount: body.amount,
-        categoryId: body.categoryId,  
-        typeId: body.typeId,  
+        title: bodyparsed.data.title,
+        amount: bodyparsed.data.amount,
+        categoryId: bodyparsed.data.categoryId,  
+        typeId: bodyparsed.data.typeId,  
       },
     });
 
@@ -81,11 +99,15 @@ transactionsRouter.delete('/:id', async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
-  const { id } = c.req.param();
+  const id = c.req.param('id');
+  const paramParsed = userIdParamSchema.safeParse(id);
+  if (!paramParsed.success) {
+    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+  }
 
   try {
     const deletedTransaction = await prisma.transaction.delete({
-      where: { id: String(id) },
+      where: { id:paramParsed.data},
     });
 
     return c.json(deletedTransaction);

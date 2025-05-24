@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import { createCategorySchema , updateCategorySchema , userIdParamSchema } from 'finance-common';
 
 export const categoriesRouter = new Hono<{
   Bindings: {
@@ -29,10 +30,14 @@ categoriesRouter.post('/', async (c) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   try {
     const body = await c.req.json();
+    const bodyparsed = createCategorySchema.safeParse(body);
+           if (!bodyparsed.success) {
+             return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+           }
     const category = await prisma.category.create({
       data: {
-        name: body.name,
-        description: body.description || null,
+        name: bodyparsed.data.name,
+        description: bodyparsed.data.description || null,
       },
     });
     return c.json(category);
@@ -45,14 +50,24 @@ categoriesRouter.post('/', async (c) => {
 // PUT /categories/:id - Update a category
 categoriesRouter.put('/:id', async (c) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
+
+  const body = await c.req.json();
+  const bodyparsed = updateCategorySchema.safeParse(body);
+         if (!bodyparsed.success) {
+           return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+         }
+
   const id = c.req.param('id');
+  const paramParsed = userIdParamSchema.safeParse(id);
+  if (!paramParsed.success) {
+       return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+     }
   try {
-    const body = await c.req.json();
     const category = await prisma.category.update({
-      where: { id },
+      where: { id:paramParsed.data },
       data: {
-        name: body.name,
-        description: body.description || null,
+        name: bodyparsed.data.name,
+        description: bodyparsed.data.description || null,
       },
     });
     return c.json(category);
@@ -65,10 +80,16 @@ categoriesRouter.put('/:id', async (c) => {
 // DELETE /categories/:id - Delete a category
 categoriesRouter.delete('/:id', async (c) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
+
   const id = c.req.param('id');
+   const paramParsed = userIdParamSchema.safeParse(id);
+  if (!paramParsed.success) {
+       return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+     }
+
   try {
     await prisma.category.delete({
-      where: { id },
+      where: { id:paramParsed.data },
     });
     return c.json({ message: 'Category deleted successfully.' });
   } catch (error) {

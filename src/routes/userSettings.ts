@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
-import { createUserSettingsSchema, updateUserSettingsSchema } from 'finance-common';
-import {z} from "zod";
+import { createUserSettingsSchema, updateUserSettingsSchema , userIdParamSchema } from 'finance-common';
+
 
 export const userSettingsRouter = new Hono<{
   Bindings: {
@@ -10,7 +10,6 @@ export const userSettingsRouter = new Hono<{
   };
 }>();
 
-const userIdParamSchema = z.string().cuid(); 
 
 // Initialize Prisma
 const getPrisma = (url: string) =>

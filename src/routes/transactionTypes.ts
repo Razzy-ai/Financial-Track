@@ -1,14 +1,14 @@
-// routes/transactionTypes.ts
-
 import { Hono } from 'hono';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import { createTransactionTypeSchema,updateTransactionTypeSchema, userIdParamSchema } from 'finance-common';
 
 export const transactionTypesRouter = new Hono<{
   Bindings: {
     DATABASE_URL: string;
   };
 }>();
+
 
 // GET all transaction types
 transactionTypesRouter.get('/', async (c) => {
@@ -31,11 +31,16 @@ transactionTypesRouter.post('/', async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
+  const body = await c.req.json();
+  const bodyparsed = createTransactionTypeSchema.safeParse(body);
+   if (!bodyparsed.success) {
+     return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+   }
+
   try {
-    const body = await c.req.json();
     const type = await prisma.transactionType.create({
       data: {
-        name: body.name,
+        name: bodyparsed.data.name,
       },
     });
     return c.json(type);
@@ -52,12 +57,22 @@ transactionTypesRouter.put('/:id', async (c) => {
   }).$extends(withAccelerate());
 
   const id = c.req.param('id');
+   const paramParsed = userIdParamSchema.safeParse(id);
+  if (!paramParsed.success) {
+    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+  }
+ 
+  const body = await c.req.json();
+  const bodyparsed = updateTransactionTypeSchema.safeParse(body);
+   if (!bodyparsed.success) {
+     return c.json({ error: 'Validation error', details: bodyparsed.error.flatten() }, 400);
+   }
+
   try {
-    const body = await c.req.json();
     const updatedType = await prisma.transactionType.update({
-      where: { id },
+      where: { id:paramParsed.data },
       data: {
-        name: body.name,
+        name: bodyparsed.data.name,
       },
     });
     return c.json(updatedType);
@@ -74,9 +89,14 @@ transactionTypesRouter.delete('/:id', async (c) => {
   }).$extends(withAccelerate());
 
   const id = c.req.param('id');
+  const paramParsed = userIdParamSchema.safeParse(id);
+  if (!paramParsed.success) {
+    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+  }
+
   try {
     const deleted = await prisma.transactionType.delete({
-      where: { id },
+      where: { id:paramParsed.data },
     });
     return c.json(deleted);
   } catch (error) {
