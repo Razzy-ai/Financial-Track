@@ -1,27 +1,22 @@
-import apiClient from "./apiClient";
-import type { CreateTransactionInput,UpdateTransactionInput} from "finance-common";
+import { apiClient } from "./apiClient";
+import  type {CreateTransactionInput, UpdateTransactionInput} from "finance-common";
 
-const endpoint = "/transactions";
+export async function getTransactions() {
+  const res = await apiClient.get("/transactions");
+  return res.data;
+}
 
-export const getTransactions = async () => {
-  const response = await apiClient.get(endpoint);
-  return response.data;
-};
+export async function createTransaction(data: CreateTransactionInput) {
+  const res = await apiClient.post("/transactions", data);
+  return res.data;
+}
 
-export const createTransaction = async (data: CreateTransactionInput) => {
-  const response = await apiClient.post(endpoint, data);
-  return response.data;
-};
+export async function updateTransaction(id: string, data: UpdateTransactionInput) {
+  const res = await apiClient.put(`/transactions/${id}`, data);
+  return res.data;
+}
 
-export const updateTransaction = async (
-  id: string,
-  data: UpdateTransactionInput
-) => {
-  const response = await apiClient.put(`${endpoint}/${id}`, data);
-  return response.data;
-};
-
-export const deleteTransaction = async (id: string) => {
-  const response = await apiClient.delete(`${endpoint}/${id}`);
-  return response.data;
-};
+export async function deleteTransaction(id: string) {
+  const res = await apiClient.delete(`/transactions/${id}`);
+  return res.data;
+}

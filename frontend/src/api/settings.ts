@@ -1,14 +1,20 @@
-import apiClient from "./apiClient";
-import type { UpdateUserSettingsInput } from "finance-common";
+import { apiClient } from "./apiClient";
+import type{
+  createUserSettingsInput,
+  UpdateUserSettingsInput,
+} from "finance-common";
 
-const endpoint = "/settings";
+export async function getSettings() {
+  const res = await apiClient.get("/settings");
+  return res.data;
+}
 
-export const getSettings = async () => {
-  const response = await apiClient.get(endpoint);
-  return response.data;
-};
+export async function createSettings(data: createUserSettingsInput) {
+  const res = await apiClient.post("/settings", data);
+  return res.data;
+}
 
-export const updateSettings = async (data: UpdateUserSettingsInput) => {
-  const response = await apiClient.put(endpoint, data);
-  return response.data;
-};
+export async function updateSettings(id: string, data: UpdateUserSettingsInput) {
+  const res = await apiClient.put(`/settings/${id}`, data);
+  return res.data;
+}

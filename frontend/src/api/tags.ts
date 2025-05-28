@@ -1,27 +1,25 @@
-import apiClient from "./apiClient";
-import type {
+import { apiClient } from "./apiClient";
+import type{
   CreateTransactionTagInput,
   UpdateTransactionTagInput,
 } from "finance-common";
 
-const endpoint = "/tags";
+export async function getTags() {
+  const res = await apiClient.get("/tags");
+  return res.data;
+}
 
-export const getTags = async () => {
-  const response = await apiClient.get(endpoint);
-  return response.data;
-};
+export async function createTag(data: CreateTransactionTagInput) {
+  const res = await apiClient.post("/tags", data);
+  return res.data;
+}
 
-export const createTag = async (data: CreateTransactionTagInput) => {
-  const response = await apiClient.post(endpoint, data);
-  return response.data;
-};
+export async function updateTag(id: string, data: UpdateTransactionTagInput) {
+  const res = await apiClient.put(`/tags/${id}`, data);
+  return res.data;
+}
 
-export const updateTag = async (id: string, data: UpdateTransactionTagInput) => {
-  const response = await apiClient.put(`${endpoint}/${id}`, data);
-  return response.data;
-};
-
-export const deleteTag = async (id: string) => {
-  const response = await apiClient.delete(`${endpoint}/${id}`);
-  return response.data;
-};
+export async function deleteTag(id: string) {
+  const res = await apiClient.delete(`/tags/${id}`);
+  return res.data;
+}

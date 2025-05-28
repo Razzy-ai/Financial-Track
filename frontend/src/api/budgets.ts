@@ -1,27 +1,26 @@
-import apiClient from "./apiClient";
+import { apiClient } from "./apiClient";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
 } from "finance-common";
 
-const endpoint = "/budgets";
+export async function getBudgets() {
+  const res = await apiClient.get("/budgets");
+  return res.data;
+}
 
-export const getBudgets = async () => {
-  const response = await apiClient.get(endpoint);
-  return response.data;
-};
+export async function createBudget(data: CreateBudgetInput) {
+  const res = await apiClient.post("/budgets", data);
+  return res.data;
+}
 
-export const createBudget = async (data: CreateBudgetInput) => {
-  const response = await apiClient.post(endpoint, data);
-  return response.data;
-};
+export async function updateBudget(id: string, data: UpdateBudgetInput) {
+  const res = await apiClient.put(`/budgets/${id}`, data);
+  return res.data;
+}
 
-export const updateBudget = async (id: string, data: UpdateBudgetInput) => {
-  const response = await apiClient.put(`${endpoint}/${id}`, data);
-  return response.data;
-};
+export async function deleteBudget(id: string) {
+  const res = await apiClient.delete(`/budgets/${id}`);
+  return res.data;
+}
 
-export const deleteBudget = async (id: string) => {
-  const response = await apiClient.delete(`${endpoint}/${id}`);
-  return response.data;
-};
