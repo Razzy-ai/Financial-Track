@@ -21,8 +21,8 @@ type ChartProps = {
 
 const Chart: React.FC<ChartProps> = ({ data, currency = "₹" }) => {
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Monthly Spending</h2>
+    <section aria-label="Monthly Spending Chart" className="p-4 bg-white rounded-2xl shadow">
+      <h2 className="text-lg font-semibold mb-4">Monthly Spending</h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -32,7 +32,7 @@ const Chart: React.FC<ChartProps> = ({ data, currency = "₹" }) => {
           <Line type="monotone" dataKey="amount" stroke="#2563eb" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </section>
   );
 };
 

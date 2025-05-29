@@ -12,12 +12,12 @@ type SummaryProps = {
 
 const Summary: React.FC<SummaryProps> = ({ data, currency = "₹" }) => {
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Category-wise Spending</h2>
+    <section aria-label="Category Spending Summary" className="p-4 bg-white rounded-2xl shadow">
+      <h2 className="text-lg font-semibold mb-4">Category-wise Spending</h2>
       <ul>
-        {data.map(({ category, amount }) => (
+        {data.map(({ category, amount }, index) => (
           <li
-            key={category}
+            key={`${category}-${index}`}
             className="flex justify-between border-b py-2 last:border-b-0"
           >
             <span>{category}</span>
@@ -28,7 +28,7 @@ const Summary: React.FC<SummaryProps> = ({ data, currency = "₹" }) => {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 };
 
