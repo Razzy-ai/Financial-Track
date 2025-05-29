@@ -19,8 +19,10 @@ const Sidebar: React.FC = () => {
             <NavLink
               to={to}
               className={({ isActive }) =>
-                `block px-3 py-2 rounded ${
-                  isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-blue-100"
+                `block px-3 py-2 rounded transition-colors duration-200 ${
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-700 hover:bg-blue-100"
                 }`
               }
             >
