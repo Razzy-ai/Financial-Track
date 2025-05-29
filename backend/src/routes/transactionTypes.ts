@@ -95,14 +95,14 @@ transactionTypesRouter.delete('/:id', async (c) => {
 
   const id = c.req.param('id');
   const paramParsed = userIdParamSchema.safeParse(id);
-
+  if (!paramParsed.success) {
+    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+  }
+  
   const existing = await prisma.transactionType.findUnique({ where: { id: paramParsed.data } });
    if (!existing) return c.json({ error: 'Transaction type not found' }, 404);
 
 
-  if (!paramParsed.success) {
-    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
-  }
 
   try {
     const deleted = await prisma.transactionType.delete({
