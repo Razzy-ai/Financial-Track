@@ -1,48 +1,57 @@
-import { useEffect, useState } from "react";
-import { getTransactions } from "@/api/transactions"; 
-import type{ CreateTransactionInput } from "finance-common"; 
+import React from "react";
+import type { Transaction, Category, TransactionType } from "@/types";
 
-export default function TransactionList() {
-  const [transactions, setTransactions] = useState<CreateTransactionInput[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+type TransactionListProps = {
+  transactions: Transaction[];
+  categories: Category[];
+  transactionTypes: TransactionType[];
+  onDelete: (id: string) => void;
+};
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const data = await getTransactions(); 
-        setTransactions(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load transactions.");
-      } finally {
-        setLoading(false);
-      }
-    };
+const TransactionList: React.FC<TransactionListProps> = ({
+  transactions,
+  categories,
+  transactionTypes,
+  onDelete,
+}) => {
+  const getCategoryName = (categoryId: string) =>
+    categories.find((cat) => cat.id === categoryId)?.name || "Unknown";
 
-    fetchTransactions();
-  }, []);
-
-  if (loading) return <p className="text-gray-500">Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const getTypeName = (typeId: string) =>
+    transactionTypes.find((type) => type.id === typeId)?.name || "Unknown";
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Your Transactions</h2>
-      {transactions.length === 0 ? (
-        <p>No transactions found.</p>
-      ) : (
-        <ul className="space-y-3">
-          {transactions.map((txn) => (
-            <li key={txn.title + txn.amount + txn.categoryId} className="bg-white p-4 rounded-lg shadow">
-              <p className="text-lg font-semibold">{txn.title}</p>
-              <p className="text-sm text-gray-600">Amount: ₹{txn.amount}</p>
-              <p className="text-sm text-gray-500">Category: {txn.categoryId}</p>
-              <p className="text-sm text-gray-500">Type ID: {txn.typeId}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <table className="transaction-list">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Amount</th>
+          <th>Category</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.length === 0 ? (
+          <tr>
+            <td colSpan={5}>No transactions found.</td>
+          </tr>
+        ) : (
+          transactions.map(({ id, title, amount, categoryId, typeId }) => (
+            <tr key={id}>
+              <td>{title}</td>
+              <td>{amount.toFixed(2)}</td>
+              <td>{getCategoryName(categoryId)}</td>
+              <td>{getTypeName(typeId)}</td>
+              <td>
+                <button onClick={() => onDelete(id)}>Delete</button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
   );
-}
+};
+
+export default TransactionList;

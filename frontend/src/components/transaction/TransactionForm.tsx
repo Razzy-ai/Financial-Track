@@ -1,111 +1,117 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateTransactionInput } from "finance-common";
-import { createTransactionSchema } from "finance-common";
-import { createTransaction, updateTransaction } from "@/api/transactions";
+import React, { useState } from "react";
+import type { Category, TransactionType } from "@/types";
 
-type Props = {
-  initialValues?: CreateTransactionInput;
-  transactionId?: string;
-  onSuccess?: () => void;
+type TransactionFormProps = {
+  categories: Category[];
+  transactionTypes: TransactionType[];
+  onSuccess: () => void;
 };
 
-const TransactionForm: React.FC<Props> = ({ initialValues, transactionId, onSuccess }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateTransactionInput>({
-    resolver: zodResolver(createTransactionSchema),
-    defaultValues: initialValues || {
-      title: "",
-      amount: 0,
-      userId: "",
-      categoryId: "",
-      typeId: "",
-    },
-  });
+const TransactionForm: React.FC<TransactionFormProps> = ({
+  categories,
+  transactionTypes,
+  onSuccess,
+}) => {
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState<number | "">("");
+  const [categoryId, setCategoryId] = useState("");
+  const [typeId, setTypeId] = useState("");
 
-  const onSubmit = async (data: CreateTransactionInput) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !amount || !categoryId || !typeId) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      if (transactionId) {
-        await updateTransaction(transactionId, data);
-      } else {
-        await createTransaction(data);
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          amount: Number(amount),
+          categoryId,
+          typeId,
+          // Include userId if necessary here or in backend
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create transaction");
       }
-      onSuccess?.();
+
+      // Reset form
+      setTitle("");
+      setAmount("");
+      setCategoryId("");
+      setTypeId("");
+
+      onSuccess();
     } catch (error) {
-      console.error("Transaction save failed:", error);
+      alert((error as Error).message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4 max-w-md">
+    <form onSubmit={handleSubmit} className="transaction-form">
       <div>
-        <label className="block font-medium mb-1" htmlFor="title">Title</label>
+        <label>Title:</label>
         <input
-          id="title"
-          {...register("title")}
-          className="input"
-          placeholder="Enter title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
         />
-        {errors.title && <p className="text-red-500 mt-1">{errors.title.message}</p>}
       </div>
 
       <div>
-        <label className="block font-medium mb-1" htmlFor="amount">Amount</label>
+        <label>Amount:</label>
         <input
-          id="amount"
           type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value === "" ? "" : Number(e.target.value))}
+          required
+          min={0.01}
           step="0.01"
-          {...register("amount", { valueAsNumber: true })}
-          className="input"
-          placeholder="Enter amount"
         />
-        {errors.amount && <p className="text-red-500 mt-1">{errors.amount.message}</p>}
       </div>
 
       <div>
-        <label className="block font-medium mb-1" htmlFor="userId">User ID</label>
-        <input
-          id="userId"
-          {...register("userId")}
-          className="input"
-          placeholder="Enter user ID"
-        />
-        {errors.userId && <p className="text-red-500 mt-1">{errors.userId.message}</p>}
+        <label>Category:</label>
+        <select
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          required
+        >
+          <option value="">Select Category</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
-        <label className="block font-medium mb-1" htmlFor="categoryId">Category ID</label>
-        <input
-          id="categoryId"
-          {...register("categoryId")}
-          className="input"
-          placeholder="Enter category ID"
-        />
-        {errors.categoryId && <p className="text-red-500 mt-1">{errors.categoryId.message}</p>}
+        <label>Transaction Type:</label>
+        <select
+          value={typeId}
+          onChange={(e) => setTypeId(e.target.value)}
+          required
+        >
+          <option value="">Select Type</option>
+          {transactionTypes.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.name}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div>
-        <label className="block font-medium mb-1" htmlFor="typeId">Transaction Type ID</label>
-        <input
-          id="typeId"
-          {...register("typeId")}
-          className="input"
-          placeholder="Enter transaction type ID"
-        />
-        {errors.typeId && <p className="text-red-500 mt-1">{errors.typeId.message}</p>}
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        {transactionId ? "Update" : "Create"} Transaction
-      </button>
+      <button type="submit">Add Transaction</button>
     </form>
   );
 };
