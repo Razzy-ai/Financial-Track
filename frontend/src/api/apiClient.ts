@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8787/api", // replace with your actual backend URL
+  baseURL: "https://backend.rasikamohite731.workers.dev", // replace with your actual backend URL
   headers: {
     "Content-Type": "application/json",
   },
