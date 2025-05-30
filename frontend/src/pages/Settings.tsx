@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSettings, updateSettings } from "@/api/settings";
+import { getSettings, updateSettings } from "../api/settings";
 import type { createUserSettingsInput, UpdateUserSettingsInput } from "finance-common";
 
 const SettingsPage = () => {

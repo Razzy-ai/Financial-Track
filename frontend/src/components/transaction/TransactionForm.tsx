@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Category, TransactionType } from "@/types";
+import type { Category, TransactionType } from "../../types";
 
 type TransactionFormProps = {
   categories: Category[];

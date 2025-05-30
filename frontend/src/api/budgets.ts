@@ -4,10 +4,12 @@ import type {
   UpdateBudgetInput,
 } from "finance-common";
 
-export async function getBudgets() {
-  const res = await apiClient.get("/budgets");
-  return res.data;
+export async function getBudgets(userId: string) {
+  const response = await fetch(`/api/budgets?userId=${userId}`);
+  if (!response.ok) throw new Error("Failed to fetch budgets");
+  return response.json();
 }
+
 
 export async function createBudget(data: CreateBudgetInput) {
   const res = await apiClient.post("/budgets", data);

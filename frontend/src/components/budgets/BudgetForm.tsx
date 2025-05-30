@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { CreateBudgetInput } from "finance-common";
 import { createBudgetSchema } from "finance-common";
-import { createBudget } from "@/api/budgets";
+import { createBudget } from "../../api/budgets";
 import { toast } from "sonner"; 
 
 interface BudgetFormProps {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getRecurringTransactions } from "@/api/recurring";
-import type { CreateRecurringTransactionInput } from "finance-common";
+import { getRecurringTransactions } from "../api/recurring";
+import type { RecurringTransaction } from "../types"; 
 
 const RecurringPage = () => {
-  const [recurring, setRecurring] = useState<CreateRecurringTransactionInput[]>([]);
+  const [recurring, setRecurring] = useState<RecurringTransaction[]>([]);
 
   useEffect(() => {
     getRecurringTransactions()
@@ -15,8 +15,8 @@ const RecurringPage = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Recurring Transactions</h1>
       <ul className="space-y-3">
-        {recurring.map((tx, index) => (
-          <li key={index} className="p-4 border rounded shadow">
+        {recurring.map((tx) => (
+          <li key={tx.id} className="p-4 border rounded shadow">
             <p><strong>Amount:</strong> ₹{tx.amount}</p>
             <p><strong>Category:</strong> {tx.category}</p>
             <p><strong>Frequency:</strong> {tx.frequency}</p>
