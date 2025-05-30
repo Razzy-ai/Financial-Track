@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getCategories } from "@/api/categories";
-import type { Category } from "@/types"; 
+import { getCategories } from "../api/categories";
+import type { Category } from "../types"; 
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
