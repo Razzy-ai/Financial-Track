@@ -5,7 +5,7 @@ import type {
 } from "finance-common";
 
 export async function getBudgets(userId: string) {
-  const response = await fetch(`/api/budgets?userId=${userId}`);
+  const response = await fetch(`/budgets?userId=${userId}`);
   if (!response.ok) throw new Error("Failed to fetch budgets");
   return response.json();
 }

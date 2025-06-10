@@ -22,6 +22,7 @@ export type Transaction = {
   transactionTypeId: string;
   createdAt: string;
   updatedAt: string;
+  date:string
 };
 
 export type SummaryItem = {
