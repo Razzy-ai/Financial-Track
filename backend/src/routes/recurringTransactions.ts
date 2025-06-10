@@ -34,24 +34,27 @@ recurringTransactionsRouter.post('/', async (c) => {
   }
 });
 
-// Read
-recurringTransactionsRouter.get('/:id', async (c) => {
+// Get all recurring transactions for a user
+recurringTransactionsRouter.get('/', async (c) => {
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-  const id = c.req.param('id');
-  const paramParsed = userIdParamSchema.safeParse(id);
-     if (!paramParsed.success) {
-       return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
-     }
+  const userId = c.req.query('userId'); 
+  const paramParsed = userIdParamSchema.safeParse(userId);
+  if (!paramParsed.success) {
+    return c.json({ error: 'Invalid userId', details: paramParsed.error.flatten() }, 400);
+  }
 
   try {
-    const rt = await prisma.recurringTransaction.findUnique({ where: { id:paramParsed.data } });
-    if (!rt) return c.json({ error: 'Recurring transaction not found' }, 404);
-    return c.json(rt);
+    const transactions = await prisma.recurringTransaction.findMany({
+      where: { userId: paramParsed.data },
+      orderBy: { nextDate: 'asc' },
+    });
+    return c.json(transactions);
   } catch (error) {
-    return c.json({ error: 'Failed to fetch recurring transaction', details: String(error) }, 500);
+    return c.json({ error: 'Failed to fetch recurring transactions', details: String(error) }, 500);
   }
 });
+
 
 // Update
 recurringTransactionsRouter.put('/:id', async (c) => {
