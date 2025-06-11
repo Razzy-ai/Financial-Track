@@ -1,6 +1,8 @@
 # prod
 dist/
 
+echo "wrangler.jsonc" >> .gitignore
+
 # dev
 .yarn/
 !.yarn/releases

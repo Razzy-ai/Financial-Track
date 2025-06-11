@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { usersRouter } from './routes/users';
+import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
 import { transactionsRouter } from './routes/transactions';
 import { transactionTypesRouter } from './routes/transactionTypes';
@@ -22,7 +23,8 @@ app.use('/*', cors());
 // Route prefix versioning like a real API
 app.route('/api/v1/transactions', transactionsRouter);
 
-app.route('api/v1/users', usersRouter);
+app.route('api/v1/users', usersRouter); // For /users
+app.route('/auth', authRouter);    // For /auth/login
 
 app.route('api/v1/categories', categoriesRouter);
 

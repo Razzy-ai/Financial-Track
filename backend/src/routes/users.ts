@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 import bcrypt from 'bcryptjs';
@@ -29,7 +30,7 @@ usersRouter.post('/', async (c) => {
         password: hashedPassword,
       },
     });
-
+    
     const { password, ...safeUser } = user;
     return c.json(safeUser);
   } catch (error) {
